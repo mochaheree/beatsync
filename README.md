@@ -13,6 +13,11 @@ IPC, pushed through UDP and rendered by Resolume, the beat is gone. Instead it
 locks a tempo, predicts where the next beat will be, and schedules the OSC
 message ~120 ms *early* so it lands on time.
 
+![BeatSync locked at 120 BPM and armed](docs/perform-armed.png)
+
+*Locked at 120, four bars in, armed. Everything you need mid-set is on this one
+screen — and the app tells you what fires next before it fires.*
+
 ---
 
 ## Install
@@ -51,6 +56,11 @@ what the clip addresses are confirmed against.
 Fifteen minutes the first time, thirty seconds every time after — settings are
 saved, except for arming, which never is.
 
+![Perform tab on a cold start, listing what is missing before you can arm](docs/perform-idle.png)
+
+*A cold start. Rather than greying out the ARM button and leaving you to guess,
+it names the two things standing in the way and fixes each in one click.*
+
 ### 1. Let Resolume listen
 
 In Resolume: **Preferences → OSC** → tick **OSC Input**, port `7000`.
@@ -82,6 +92,10 @@ without BeatSync taking over.
 
 ### 4. Feed it audio
 
+![The Setup tab: audio input, Resolume target, triggers, tempo and timing](docs/setup.png)
+
+*The whole Setup tab. Everything here is configured once and remembered.*
+
 **Setup → Audio**. Pick your input, press **Start mic**.
 
 Play music and watch the four meters. **Low / Mid / High** should move with the
@@ -95,8 +109,8 @@ raise the **Noise gate**.
 
 ### 5. Tell it roughly what tempo to expect
 
-**Setup → Sync → BPM range.** This matters more than anything else on that
-screen.
+**Setup → Tempo and timing → BPM range.** This matters more than anything else
+on that card.
 
 Blind, on the default 80–160 range, tempo detection gets 6 out of 10 right.
 Narrowed to around ±12% of the actual material, it gets 10 out of 10. Both
@@ -174,14 +188,14 @@ closes, and it never starts up armed — you will always arm deliberately.
 
 ## Pushing tempo to Resolume
 
-**This one is on by default, and you should turn it off until you've
-calibrated it** — Setup → Sync → *Push detected BPM to Resolume*. It only sends
+**This one is on by default, and you should turn it off until you've calibrated
+it** — Setup → Tempo and timing → *Push detected BPM to Resolume*. It only sends
 while armed, so nothing happens before then, but here's the trap.
 
 Resolume's tempo OSC parameter is a **normalised 0–1 value, not a BPM**. Send it
 a raw `100` and it clamps to `1.0`, which shows up in Arena as 500 BPM. BeatSync
-converts for you using the range in **Setup → Sync → Tempo range calibration**,
-but the 20–500 default is an assumption about your Arena build, not a fact.
+converts for you using the range in **Setup → Tempo range calibration**, but the
+20–500 default is an assumption about your Arena build, not a fact.
 
 Calibrate it:
 
@@ -196,7 +210,7 @@ for.
 
 ---
 
-## The rest of Setup → Sync
+## The rest of Tempo and timing
 
 | Control | Use it when |
 |---|---|
@@ -223,6 +237,11 @@ for.
 
 The **Activity** tab logs the last 200 events with millisecond stamps — mic,
 OSC, beat and errors. When something goes wrong mid-set, that's where it is.
+
+![The Activity log showing triggers firing every four bars](docs/activity.png)
+
+*A trigger in cycle mode, doing exactly what it was told: every 4 bars, layer 1,
+walking clips 1–4. Eight seconds apart at 120 BPM.*
 
 ---
 
@@ -314,11 +333,15 @@ disarming stops them again.
 
 ## Interface notes
 
-Two screens, because there are really only two jobs. **Perform** is what stays
-on screen during a set: the tempo, where you are in the bar, and one button that
-decides whether BeatSync is driving Resolume. Until you can arm, it says exactly
-what's missing and fixes it in one click. **Setup** holds everything configured
-once. **Activity** is the log.
+Two screens do the work, because there are really only two jobs. **Perform** is
+what stays up during a set: the tempo, where you are in the bar, and one button
+that decides whether BeatSync is driving Resolume. Until you can arm, it says
+exactly what's missing and fixes it in one click. **Setup** holds everything
+configured once. **Activity** is the log, and **Donate** is there if this saved
+you an evening.
+
+Status — mic, OSC target, armed, BPM — lives in the header rather than on a
+tab, so it's readable no matter which screen you left open.
 
 Built on the shadcn preset `b7PaZO816h` (style Vega, base Neutral, radius Large,
 Source Sans 3 + IBM Plex Sans, Phosphor icons), rebuilt as Svelte 5 components
@@ -358,6 +381,15 @@ npm run test:background   # proves rAF keeps running while minimised
 
 `BEATSYNC_DEVTOOLS=1` opens DevTools on launch.
 
+The screenshots above aren't hand-cropped — they're captured from the real app
+by the same CDP harness the e2e test uses, fed the same synthetic click track.
+Regenerate them after a UI change instead of letting them go stale:
+
+```bash
+npm run dev:renderer      # in one terminal
+npm run screenshots       # writes docs/*.png
+```
+
 ---
 
 ## Layout
@@ -391,6 +423,7 @@ scripts/
   cdp.mjs             Shared DevTools-protocol driver for the UI tests
   osc-decode.mjs      Independent OSC decoder used by the tests
   make-clicktrack.mjs Generates the WAV click track used by the e2e test
+  screenshots.mjs     Captures the README images from the running app over CDP
   recolor-icon.py     Rebuilds icon/app-icon.* in the brand colour
   dev-electron.mjs    Launcher that strips ELECTRON_RUN_AS_NODE
 ```

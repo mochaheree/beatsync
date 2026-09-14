@@ -199,7 +199,7 @@ Standalone Electron desktop application. No server, no account, no network depen
 
 | ID | Requirement |
 |---|---|
-| **FR-11.1** | Three screens: **Perform** (tempo, bar position, ARM), **Setup** (audio, Resolume, triggers, sync), **Activity** (log). |
+| **FR-11.1** | Four tabs: **Perform** (tempo, bar position, ARM), **Setup** (audio input, Resolume target, triggers, tempo and timing, tempo range calibration), **Activity** (log) and **Donate** (support links, Saweria + QRIS). Live status — mic, OSC target, armed, BPM — lives in the header, never behind a tab. |
 | **FR-11.2** | Perform shall show BPM large enough to read across a dark room, a per-beat visual pulse, bar/beat position, and confidence. |
 | **FR-11.3** | The system title bar shall be hidden and replaced by the app header (48 px, matching `titleBarOverlay.height`); min/max/close shall remain **native** via `titleBarOverlay`, preserving Windows 11 Snap Layouts and correct close behaviour. |
 | **FR-11.4** | The header shall lay out inside `env(titlebar-area-*)` so it never collides with the native controls at any window size or DPI, and shall act as the window drag handle, with interactive children marked `.no-drag`. |
@@ -225,7 +225,8 @@ Measured against synthetic click tracks and drum patterns. ⚠️ **Live-room ac
 - **NFR-2.1** The single most important safety property is FR-5.1: a connected, tempo-locked, disarmed app emits **zero** UDP datagrams. `npm run test:e2e` holds the app in that state for six bars and asserts zero datagrams leave, then that arming starts them and disarming stops them.
 
 ### 4.3 Security
-- **NFR-3.1** `contextIsolation: true`, `nodeIntegration: false`; the renderer's only privileged surface is the ten explicitly listed `window.api` methods in [preload.cjs](src/preload.cjs).
+- **NFR-3.1** `contextIsolation: true`, `nodeIntegration: false`; the renderer's only privileged surface is the explicitly listed `window.api` methods in [preload.cjs](src/preload.cjs).
+- **NFR-3.4** Clipboard writes shall be routed through main (`system:copyText`). The renderer's own clipboard API is denied by the permission handler, which grants microphone access only — calling it directly would fail silently while the UI still claimed success.
 - **NFR-3.2** No outbound network traffic other than UDP to the operator-specified OSC target.
 - **NFR-3.3** No telemetry, no accounts, no remote configuration.
 
@@ -258,6 +259,7 @@ Measured against synthetic click tracks and drum patterns. ⚠️ **Live-room ac
 | `setTempoNormalised` | `osc:setTempoNormalised` | `value 0..1` | `{ok, data:{normalised}}` |
 | `resync` | `osc:resync` | — | `{ok}` |
 | `tempoTap` | `osc:tempoTap` | — | `{ok}` |
+| `copyText` | `system:copyText` | `text` | `{ok}` |
 
 Every handler is wrapped so an exception returns `{ok:false, error}` rather than rejecting.
 
