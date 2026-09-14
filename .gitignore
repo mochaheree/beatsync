@@ -1,0 +1,6 @@
+dist/
+electron.log
+install.log
+node_modules/
+release/
+vite.log

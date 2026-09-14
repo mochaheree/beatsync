@@ -1,0 +1,48 @@
+{
+  "name": "beatsync",
+  "version": "0.1.0",
+  "description": "CUEVO BeatSync - auto beat-sync controller for Resolume Arena",
+  "main": "src/main/index.cjs",
+  "type": "module",
+  "scripts": {
+    "dev": "node scripts/dev-electron.mjs",
+    "dev:renderer": "vite",
+    "build:renderer": "vite build",
+    "build": "vite build && electron-builder",
+    "test": "node scripts/test-tempo.mjs && node scripts/test-osc.mjs",
+    "test:e2e": "node scripts/test-e2e.mjs && node scripts/test-arm.mjs",
+    "test:background": "node scripts/dev-electron.mjs scripts/test-background.cjs",
+    "test:accuracy": "node scripts/test-accuracy.mjs",
+    "test:flux": "node scripts/test-flux.mjs --mode bands"
+  },
+  "devDependencies": {
+    "@fontsource-variable/ibm-plex-sans": "^5.3.0",
+    "@fontsource-variable/source-sans-3": "^5.3.0",
+    "@sveltejs/vite-plugin-svelte": "^5.0.3",
+    "@tailwindcss/vite": "^4.1.0",
+    "electron": "^33.0.0",
+    "electron-builder": "^25.1.8",
+    "phosphor-svelte": "^3.1.0",
+    "svelte": "^5.19.0",
+    "tailwindcss": "^4.1.0",
+    "vite": "^6.0.0"
+  },
+  "build": {
+    "appId": "com.cuevo.beatsync",
+    "productName": "CUEVO BeatSync",
+    "files": [
+      "dist/**/*",
+      "src/main/**/*",
+      "src/preload.cjs",
+      "icon/**/*",
+      "package.json"
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "icon/app-icon.ico"
+    },
+    "nsis": {
+      "shortcutName": "CUEVO BeatSync"
+    }
+  }
+}

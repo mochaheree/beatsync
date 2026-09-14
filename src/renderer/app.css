@@ -1,0 +1,134 @@
+@import "tailwindcss";
+
+/* Fonts from the shadcn preset (Source Sans 3 headings, IBM Plex Sans body),
+   bundled rather than loaded from Google so the app works in a venue with no
+   internet. */
+@import "@fontsource-variable/source-sans-3";
+@import "@fontsource-variable/ibm-plex-sans";
+
+/* shadcn preset b7PaZO816h — style Vega, base Neutral, radius Large. Neutral
+   scale taken verbatim from ui.shadcn.com/r/colors/neutral.json; the preset's
+   lime accent is replaced by the CUEVO brand colour.
+
+   #335C67 measures 7.32:1 under white, so it is a strong fill — but only 2.70:1
+   as text on this background, under even the 3.0 large-text floor. So the brand
+   colour fills (buttons, the logo mark) and a lighter tint of the same hue
+   (217°) carries anything thin or text-like: 7.53:1, readable across a dark
+   room. Never set type in --primary on --background.
+
+   Dark-only: a booth is dark and a light flash mid-set is a hazard. */
+:root {
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.205 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.205 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: #335C67;
+  --primary-foreground: #ffffff;
+  --primary-bright: #7ca7b3;
+  --secondary: oklch(0.269 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --accent: oklch(0.269 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.704 0.191 22.216);
+  --destructive-foreground: oklch(0.985 0 0);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: #335C67;
+
+  --radius: 1rem;
+
+  --font-sans: 'IBM Plex Sans Variable', system-ui, sans-serif;
+  --font-heading: 'Source Sans 3 Variable', system-ui, sans-serif;
+  --font-mono: ui-monospace, 'Cascadia Mono', 'Segoe UI Mono', monospace;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary-bright: var(--primary-bright);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --font-sans: var(--font-sans);
+  --font-heading: var(--font-heading);
+  --font-mono: var(--font-mono);
+
+  --radius-xs: 0.125rem;
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+}
+
+html, body, #app { height: 100%; }
+
+/* Custom title bar. The header doubles as the window's drag handle, so every
+   control inside it has to opt back out or it stops receiving clicks. */
+.drag-region { -webkit-app-region: drag; }
+.no-drag { -webkit-app-region: no-drag; }
+
+/* Window Controls Overlay: the native min/max/close buttons sit at
+   titlebar-area-x + titlebar-area-width. Laying the header out inside that box
+   keeps our content clear of them on any OS and at any DPI. The fallbacks apply
+   in a plain browser, where the overlay does not exist. */
+.titlebar-inner {
+  margin-left: env(titlebar-area-x, 0px);
+  width: env(titlebar-area-width, 100%);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  margin: 0;
+  overflow: hidden;
+  user-select: none;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3 { font-family: var(--font-heading); }
+input, select { user-select: text; }
+
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-thumb {
+  background: oklch(1 0 0 / 12%);
+  border-radius: 9999px;
+  border: 3px solid transparent;
+  background-clip: content-box;
+}
+::-webkit-scrollbar-thumb:hover { background: oklch(1 0 0 / 20%); background-clip: content-box; }
+::-webkit-scrollbar-track { background: transparent; }
+
+/* A beat needs to read from across a dark room, so the pulse is a scale+glow
+   rather than a colour change. */
+@keyframes beat-pulse {
+  0%   { transform: scale(1);    box-shadow: 0 0 0 0 var(--primary-bright); opacity: 1; }
+  100% { transform: scale(1.35); box-shadow: 0 0 0 14px transparent; opacity: 0; }
+}
+.beat-ring { animation: beat-pulse 420ms cubic-bezier(0.22, 1, 0.36, 1); }
+
+@keyframes armed-breathe {
+  0%, 100% { box-shadow: 0 0 0 0 oklch(0.704 0.191 22.216 / 45%); }
+  50%      { box-shadow: 0 0 0 8px oklch(0.704 0.191 22.216 / 0%); }
+}
+.armed-breathe { animation: armed-breathe 2s ease-in-out infinite; }
